@@ -18,28 +18,33 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Create output folder
+      - name: Create output directory
         run: mkdir -p out
 
       - name: Compile Java code
         run: javac -d out src/Main.java
 
-      - name: Upload compiled artifact
+      - name: Create JAR file
+        run: jar cfe app.jar Main -C out .
+
+      - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:
-          name: java-build-artifact
-          path: out/
+          name: java-jar-artifact
+          path: app.jar
 
   cd:
     needs: ci
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download build artifact
+      - name: Download JAR artifact
         uses: actions/download-artifact@v4
         with:
-          name: java-build-artifact
-          path: out/
+          name: java-jar-artifact
+          path: output
 
       - name: Simulate deployment
-        run: echo "Deployment successful. Artifact is ready."
+        run: |
+          echo "Deployment successful"
+          ls -l output
