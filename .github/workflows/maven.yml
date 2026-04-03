@@ -1,11 +1,11 @@
-name: Java CI
+name: Java CI CD
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  build:
+  ci:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,5 +18,28 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Compile Java
-        run: javac src/Main.java
+      - name: Create output folder
+        run: mkdir -p out
+
+      - name: Compile Java code
+        run: javac -d out src/Main.java
+
+      - name: Upload compiled artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-build-artifact
+          path: out/
+
+  cd:
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: java-build-artifact
+          path: out/
+
+      - name: Simulate deployment
+        run: echo "Deployment successful. Artifact is ready."
